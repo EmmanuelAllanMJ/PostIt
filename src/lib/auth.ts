@@ -1,8 +1,10 @@
 import { Prisma } from "@prisma/client";
+import bcrypt from "bcrypt"
 import { NextAuthOptions, getServerSession } from "next-auth";
 import { db } from "./db";
 import {PrismaAdapter} from "@next-auth/prisma-adapter";
 import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from 'next-auth/providers/credentials';
 import { nanoid } from "nanoid";
 
 export const authOptions:NextAuthOptions = {
@@ -17,7 +19,41 @@ export const authOptions:NextAuthOptions = {
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID!,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-        })
+        }),
+        CredentialsProvider({
+            name: 'credentials',
+            credentials: {
+              email: { label: 'email', type: 'email' },
+              password: { label: 'password', type: 'password' }
+            },
+            async authorize(credentials) {
+              if (!credentials?.email || !credentials?.password) {
+                throw new Error('Invalid credentials');
+              }
+      
+              const user = await db.user.findUnique({
+                where: {
+                  email: credentials.email
+                }
+              });
+      
+              if (!user || !user?.hashedPassword) {
+                throw new Error('Invalid credentials');
+              }
+      
+              const isCorrectPassword = await bcrypt.compare(
+                credentials.password,
+                user.hashedPassword
+              );
+      
+              if (!isCorrectPassword) {
+                throw new Error('Invalid credentials');
+              }
+      
+              return user;
+            }
+          })
+
     ],
     callbacks: {   // Configure callbacks
         async session({token, session}) {   // Add user id to session

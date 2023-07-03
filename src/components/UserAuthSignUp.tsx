@@ -17,7 +17,7 @@ import { nanoid } from 'nanoid'
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
+const UserAuthSignUp: FC<UserAuthFormProps> = ({ className, ...props }) => {
   const { toast } = useToast()
   const [isLoadingGoogle, setIsLoadingGoogle] = React.useState<boolean>(false)
   const [isLoadingCredentials, setIsLoadingCredentials] = React.useState<boolean>(false)
@@ -38,7 +38,7 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
     }
   }
 
-  const loginWithCredentials = (e:React.FormEvent<HTMLFormElement>) => {
+  const loginWithCredentials = async(e:React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoadingCredentials(true);
     const data={
@@ -47,24 +47,23 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
     }
     console.log(data)
     try{
-      // signIn('credentials', { 
-      //   ...data, 
-      //   redirect: false,
-      // })
-      axios.post('api/register/', data)
-      .then((res) => {
-        console.log(res);
-        // console.log(res.data);
-      }
-      )
-      .catch((err) => {
-        console.log(err);
-      }
-      )
-      .finally(() => {
-        setIsLoadingCredentials(false)
-      }
-      )
+      await signIn('credentials', { 
+        ...data, 
+      })
+    //   axios.post('api/register/', data)
+    //   .then((res) => {
+    //     console.log(res);
+    //     // console.log(res.data);
+    //   }
+    //   )
+    //   .catch((err) => {
+    //     console.log(err);
+    //   }
+    //   )
+    //   .finally(() => {
+    //     setIsLoadingCredentials(false)
+    //   }
+    //   )
 
     }
     catch (error) {
@@ -112,15 +111,6 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
             id='password'
             className='border border-gray-300 rounded-sm px-2 py-1 text-sm'
           />
-          <label htmlFor='cpassword' className='text-sm font-medium'>
-            Confirm Password
-          </label>
-          <input
-            type='password'
-            name='cpassword'
-            id='cpassword'
-            className='border border-gray-300 rounded-sm px-2 py-1 text-sm'
-          />
               <Button
         isLoading={isLoadingCredentials}
         type='submit'
@@ -128,7 +118,6 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
         className='w-full'
     
         disabled={isLoadingCredentials}>
-        {isLoadingCredentials ? null : <Icons.google className='h-4 w-4 mr-2' />}
 
         Submit
       </Button>
@@ -139,4 +128,4 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
   )
 }
 
-export default UserAuthForm
+export default UserAuthSignUp

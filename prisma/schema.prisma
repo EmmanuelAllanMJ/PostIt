@@ -24,6 +24,7 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
+  
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -43,6 +44,7 @@ model User {
   name          String?
   email         String?   @unique
   emailVerified DateTime?
+  hashedPassword  String?
 
   username String? @unique
 
