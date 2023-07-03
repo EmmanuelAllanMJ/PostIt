@@ -38,7 +38,7 @@ const UserAuthSignUp: FC<UserAuthFormProps> = ({ className, ...props }) => {
     }
   }
 
-  const loginWithCredentials = async(e:React.FormEvent<HTMLFormElement>) => {
+  const loginWithCredentials = async(e:any) => {
     e.preventDefault();
     setIsLoadingCredentials(true);
     const data={
@@ -50,21 +50,6 @@ const UserAuthSignUp: FC<UserAuthFormProps> = ({ className, ...props }) => {
       await signIn('credentials', { 
         ...data, 
       })
-    //   axios.post('api/register/', data)
-    //   .then((res) => {
-    //     console.log(res);
-    //     // console.log(res.data);
-    //   }
-    //   )
-    //   .catch((err) => {
-    //     console.log(err);
-    //   }
-    //   )
-    //   .finally(() => {
-    //     setIsLoadingCredentials(false)
-    //   }
-    //   )
-
     }
     catch (error) {
       toast({

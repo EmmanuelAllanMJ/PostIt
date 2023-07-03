@@ -38,19 +38,15 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
     }
   }
 
-  const loginWithCredentials = (e:React.FormEvent<HTMLFormElement>) => {
+  const loginWithCredentials = (e:any) => {
     e.preventDefault();
     setIsLoadingCredentials(true);
     const data={
       email:e.target[0].value,
       password:e.target[1].value,
     }
-    console.log(data)
     try{
-      // signIn('credentials', { 
-      //   ...data, 
-      //   redirect: false,
-      // })
+
       axios.post('api/register/', data)
       .then((res) => {
         console.log(res);
