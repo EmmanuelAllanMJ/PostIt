@@ -76,7 +76,7 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
 
 
   return (
-    <div className={cn('flex justify-center', className)} {...props}>
+    <div className={cn('flex justify-center flex-col ', className)} {...props}>
       <Button
         isLoading={isLoadingGoogle}
         type='button'
@@ -87,6 +87,13 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
         {isLoadingGoogle ? null : <Icons.google className='h-4 w-4 mr-2' />}
         Google
       </Button>
+
+      <div className='flex items-center justify-center space-x-2 my-3'>
+        <div className='border border-gray-300 w-16' />
+        <span className='text-gray-400'>or</span>
+        <div className='border border-gray-300 w-16' />
+      </div>
+      
       {/* Credentials */}
     <form className='flex flex-col space-y-4' onSubmit={loginWithCredentials}>
         <div className='flex flex-col space-y-2'>
@@ -124,7 +131,6 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
         className='w-full'
     
         disabled={isLoadingCredentials}>
-        {isLoadingCredentials ? null : <Icons.google className='h-4 w-4 mr-2' />}
 
         Submit
       </Button>
