@@ -18,7 +18,7 @@ const Navbar = async() => {
         <div className="flex gap-5">
 
         {session ? (<UserAccountNav user={session.user} />) :<Link href='/sign-in' className={buttonVariants()}>Sign In</Link>}
-        {session ? (<UserAccountNav user={session.user} />) :<Link href='/sign-up' className={buttonVariants()}>Log In</Link>}
+        {!session && <Link href='/sign-up' className={buttonVariants()}>Log In</Link>}
         </div>
       </div>     
     </div>
