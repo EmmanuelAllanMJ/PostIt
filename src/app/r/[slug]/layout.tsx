@@ -83,9 +83,9 @@ const layout: FC<layoutProps> = async ({ children, params: { slug } }) => {
                         ) : null}
                         {subreddit.creatorId !== session?.user?.id ? (
                             <SubscribeLeaveToggle
-                                // isSubscribed={isSubscribed}
-                                // subredditId={subreddit.id}
-                                // subredditName={subreddit.name}
+                                isSubscribed={isSubscribed}
+                                subredditId={subreddit.id}
+                                subredditName={subreddit.name}
                             />
                         ) : null}
                     </dl>

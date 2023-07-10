@@ -1,6 +1,6 @@
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { subredditValitador } from "@/lib/validators/subreddit";
+import { SubredditValitador } from "@/lib/validators/subreddit";
 import { z } from "zod";
 
 export async function POST(req:Request){
@@ -13,7 +13,7 @@ export async function POST(req:Request){
         const body = await req.json();
         
         // here we are checking if the body is valid 
-        const {name} = subredditValitador.parse(body);
+        const {name} = SubredditValitador.parse(body);
 
         const subredditExists = await db.subreddit.findFirst({
             where:{

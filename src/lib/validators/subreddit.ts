@@ -1,12 +1,12 @@
 import {z} from 'zod'
 
-export const subredditValitador = z.object({
+export const SubredditValitador = z.object({
     name: z.string().min(3).max(21),
+})  
+
+export const SubredditSubscriptionValidator = z.object({
+    subredditId: z.string(),
 })
 
-export const SubredditSubcriptionzvalidator = z.object({
-    subredditId: z.string().uuid(),
-})
-
-export type CreateSubredditPayload = z.infer<typeof subredditValitador>
-export type SubscribeToSubredditPayload = z.infer<typeof SubredditSubcriptionzvalidator>
+export type CreateSubredditPayload = z.infer<typeof SubredditValitador>
+export type SubscribeToSubredditPayload = z.infer<typeof SubredditSubscriptionValidator>
