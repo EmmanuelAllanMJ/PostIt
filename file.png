@@ -1,0 +1,39 @@
+arrayBuffer() {
+    if (!isBlob(this))
+      return PromiseReject(new ERR_INVALID_THIS('Blob'));
+
+    // If there's already a promise in flight for the content,
+    // reuse it, but only while it's in flight. After the cached
+    // promise resolves it will be cleared, allowing it to be
+    // garbage collected as soon as possible.
+    if (this[kArrayBufferPromise])
+      return this[kArrayBufferPromise];
+
+    const job = new FixedSizeBlobCopyJob(this[kHandle]);
+
+    const ret = job.run();
+
+    // If the job returns a value immediately, the ArrayBuffer
+    // was generated synchronously and should just be returned
+    // directly.
+    if (ret !== undefined)
+      return PromiseResolve(ret);
+
+    const {
+      promise,
+      resolve,
+      reject,
+    } = createDeferredPromise();
+
+    job.ondone = (err, ab) => {
+      if (err !== undefined)
+        return reject(new AbortError(undefined, { cause: err }));
+      resolve(ab);
+    };
+    this[kArrayBufferPromise] =
+    SafePromisePrototypeFinally(
+      promise,
+      () => this[kArrayBufferPromise] = undefined);
+
+    return this[kArrayBufferPromise];
+  }
