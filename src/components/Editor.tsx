@@ -8,6 +8,10 @@ import type EditorJS from '@editorjs/editorjs'
 import { set } from 'date-fns'
 import { BlobServiceClient, ContainerClient } from "@azure/storage-blob";
 import axios from 'axios'
+import { toast } from '@/hooks/use-toast'
+import { on } from 'events'
+import { useMutation } from '@tanstack/react-query'
+import { usePathname, useRouter } from 'next/navigation'
 
 
 
@@ -30,10 +34,13 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
     }
   })
 
+  const _titleRef = useRef<HTMLTextAreaElement>(null)
+
   const ref = useRef<EditorJS>()
 
   const [isMounted, setIsMounted] = useState<boolean>(false)
-
+  const pathname = usePathname()
+  const router = useRouter() 
 
 
   // async function uploadImageToBlobStorage(file: File) {
@@ -105,7 +112,7 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
                   formData.append('file', file);
                   console.log("Client file", file, formData.get('file'))
 
-                  const response = await axios.post('/api/upload', formData , {
+                  const response = await axios.post('/api/upload', formData, {
                     headers: {
                       'Content-Type': 'multipart/form-data'
                     }
@@ -140,36 +147,93 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
       setIsMounted(true)
     }
   }, [])
+
+  useEffect(() => {
+    if(Object.keys(errors).length > 0) {
+      for (const [_key, value] of Object.entries(errors)) {
+        toast({
+          title: 'Error',
+          description: (value as {message:string}).message,
+          variant: 'destructive'
+        })
+      }
+    }
+  }, [errors])
+
   useEffect(() => {
     const init = async () => {
       await initializeEditor()
 
       setTimeout(() => {
         // set focus to title
+        _titleRef.current?.focus()
       })
 
     }
     if (isMounted) {
       init()
-      return () => { }
+      return () => {
+        ref.current?.destroy()
+        ref.current = undefined
+      }
     }
   }, [isMounted, initializeEditor])
 
+  const {mutate:createPost} = useMutation({
+    mutationFn:async ({title, content, subredditId}:PostCreationRequest) => {
+      const payload : PostCreationRequest = {
+        title,
+        content,
+        subredditId
+      }
+      const {data} = await axios.post('/api/subreddit/post/create', payload)
+      return data
+    },
+    onError: (err) => {
+      toast({
+        title: 'Something went wrong',
+        description: 'Your post is not published. Please try again later',
+        variant: 'destructive'
+      })
+    },
+    onSuccess: () => {
+      const newpathname = pathname.split('/').slice(0, -1).join('/')
+      router.push(newpathname)
+      router.refresh()
+      toast({
+        description: 'Your post is published',
+      })
+    }
+
+  })
+
+  async function onSubmit(data: PostCreationRequest) {
+    const  blocks  = await ref.current?.save() || { blocks: [] }
+    const payload : PostCreationRequest = {
+        title: data.title,
+        content: JSON.stringify(blocks),
+        subredditId
+    }
+
+    createPost(payload)
+  }
+
+  const { ref: titleRef, ...titleProps } = register('title')
 
   return <div className='w-full p-4 bg-zinc-50 rounded-lg border border-zinc-200'>
     <form
       id='subreddit-post-form'
       className='w-fit'
-    // onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(onSubmit)}
     >
       <div className='prose prose-stone dark:prose-invert'>
         <TextareaAutosize
-          // ref={(e) => {
-          //   titleRef(e)
-          // @ts-ignore
-          //   _titleRef.current = e
-          // }}
-          // {...rest}
+          ref={e => {
+            titleRef(e)
+            // @ts-ignore
+            _titleRef.current = e
+          }}
+          {...titleProps}
           placeholder='Title'
           className='w-full resize-none appearance-none overflow-hidden bg-transparent text-5xl font-bold focus:outline-none'
         />
