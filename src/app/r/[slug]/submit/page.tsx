@@ -9,6 +9,8 @@ type PageProps = {
     slug: string;
   }
 };
+
+
 const page = async({ params }: PageProps) => {
 
   const subreddit = await db.subreddit.findFirst({

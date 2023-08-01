@@ -40,7 +40,7 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
 
   const [isMounted, setIsMounted] = useState<boolean>(false)
   const pathname = usePathname()
-  const router = useRouter() 
+  const router = useRouter()
 
 
   // async function uploadImageToBlobStorage(file: File) {
@@ -72,6 +72,16 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
   //     console.log(error);
   //   }
   // }
+
+  function convertFileToBase64(file:Blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result!.toString().split(',')[1]);
+      reader.onerror = (error) => reject(error);
+    });
+  }
+  
 
   const initializeEditor = useCallback(async () => {
     const { default: EditorJS } = await import('@editorjs/editorjs')
@@ -107,28 +117,36 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
             class: ImageTool,
             config: {
               uploader: {
-                uploadByFile: async (file: Blob) => {
-                  const formData = new FormData();
-                  formData.append('file', file);
-                  console.log("Client file", file, formData.get('file'))
-
-                  const response = await axios.post('/api/upload', formData, {
-                    headers: {
-                      'Content-Type': 'multipart/form-data'
-                    }
-                  });
-
-
-                  return {
-                    success: 1,
-                    file: {
-                      url: response.data.file.url,
-                    },
-                  };
+                uploadByFile: async (file:Blob) => {
+                  try {
+                    // Convert file to base64 string
+                    const base64String = await convertFileToBase64(file);
+          
+                    // Upload base64 string to blob storage
+                    const response = await axios.post('/api/upload', { base64String });
+          
+                    // Return the response in the correct format
+                    return {
+                      success: 1,
+                      file: {
+                        url: response.data.url,
+                      },
+                    };
+                  } catch (error) {
+                    console.error('Error uploading image:', error);
+                    return {
+                      success: 0,
+                      file: {
+                        url: '',
+                      },
+                    };
+                  }
                 },
               },
             },
           },
+          
+
 
           list: List,
           code: Code,
@@ -149,11 +167,11 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
   }, [])
 
   useEffect(() => {
-    if(Object.keys(errors).length > 0) {
+    if (Object.keys(errors).length > 0) {
       for (const [_key, value] of Object.entries(errors)) {
         toast({
           title: 'Error',
-          description: (value as {message:string}).message,
+          description: (value as { message: string }).message,
           variant: 'destructive'
         })
       }
@@ -179,14 +197,14 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
     }
   }, [isMounted, initializeEditor])
 
-  const {mutate:createPost} = useMutation({
-    mutationFn:async ({title, content, subredditId}:PostCreationRequest) => {
-      const payload : PostCreationRequest = {
+  const { mutate: createPost } = useMutation({
+    mutationFn: async ({ title, content, subredditId }: PostCreationRequest) => {
+      const payload: PostCreationRequest = {
         title,
         content,
         subredditId
       }
-      const {data} = await axios.post('/api/subreddit/post/create', payload)
+      const { data } = await axios.post('/api/subreddit/post/create', payload)
       return data
     },
     onError: (err) => {
@@ -208,11 +226,11 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
   })
 
   async function onSubmit(data: PostCreationRequest) {
-    const  blocks  = await ref.current?.save() || { blocks: [] }
-    const payload : PostCreationRequest = {
-        title: data.title,
-        content: blocks,
-        subredditId
+    const blocks = await ref.current?.save() || { blocks: [] }
+    const payload: PostCreationRequest = {
+      title: data.title,
+      content: blocks,
+      subredditId
     }
 
     createPost(payload)
