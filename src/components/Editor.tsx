@@ -211,7 +211,7 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
     const  blocks  = await ref.current?.save() || { blocks: [] }
     const payload : PostCreationRequest = {
         title: data.title,
-        content: JSON.stringify(blocks),
+        content: blocks,
         subredditId
     }
 
