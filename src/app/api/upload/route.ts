@@ -1,6 +1,8 @@
 import { BlobServiceClient, ContainerClient } from "@azure/storage-blob";
 import { Console } from "console";
 import { nanoid } from "nanoid";
+import sharp from 'sharp';
+
 
 const containerName = `postit`;
 const sasToken = process.env.SAS_TOKEN;
@@ -52,6 +54,10 @@ export async function POST(req: Request) {
   const encoded = base64String.base64String.replace(/^data:(.*,)?/, '');
   // console.log(encoded)
   const buffer = Buffer.from(encoded, 'base64');
+    // Compress the image using sharp
+    const compressedBuffer = await sharp(buffer)
+    .resize({ width: 500, withoutEnlargement: true }) // Set the desired width for the compressed image and prevent enlargement
+    .toBuffer();
 
   const blobService = new BlobServiceClient(process.env.AZURE_STORAGE_CONNECTION_STRING!);
   const containerClient: ContainerClient = await blobService.getContainerClient(containerName)
@@ -63,11 +69,12 @@ export async function POST(req: Request) {
   // Set the content type based on the file extension
   const contentType = getContentTypeFromExtension(extension);
 
-  const result = await blobClient.uploadData(buffer, { blobHTTPHeaders: { blobContentType: contentType } });
+  const result = await blobClient.uploadData(compressedBuffer, { blobHTTPHeaders: { blobContentType: contentType } });
   console.log("Result", result)
 
   return new Response(JSON.stringify({ message: "success", url: `https://${storageAccountName}.blob.core.windows.net/${containerName}/${blobClient.name}`, status: result._response.status }))
 }
+
 
 function getFileExtension(base64String: string): string {
   const matches = base64String.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
