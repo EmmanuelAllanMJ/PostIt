@@ -1,7 +1,7 @@
 "use client"
 
 import { ExtendedPost } from '@/types/db';
-import { FC, useRef } from 'react'
+import { FC, useEffect, useRef } from 'react'
 import { useIntersection } from "@mantine/hooks"
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { INFINITE_SCROLL_PAGINATION_RESULTS } from '@/config';
@@ -28,8 +28,7 @@ const PostFeed: FC<PostFeedProps> = ({ initialPosts, subredditName }) => {
         async ({ pageParam = 1 }) => {
             const query = `/api/post?limit=${INFINITE_SCROLL_PAGINATION_RESULTS}&page=${pageParam}` +
                 (!!subredditName ? `&subreddit=${subredditName}` : '')
-
-            const { data } = await axios.get(query)
+                const { data } = await axios.get(query)
             return data as ExtendedPost[]
         },
         {
@@ -43,6 +42,12 @@ const PostFeed: FC<PostFeedProps> = ({ initialPosts, subredditName }) => {
             }
         }
     )
+
+    useEffect(() => {
+        if (entry?.isIntersecting) {
+            fetchNextPage()
+        }
+    }, [entry?.isIntersecting])
 
     const posts = data?.pages.flatMap(page => page) || initialPosts
 
