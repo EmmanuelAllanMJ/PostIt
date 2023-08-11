@@ -4,13 +4,13 @@ import Post from '@/components/Post'
 import PostVoteServer from '@/components/post-vote/PostVoteServer'
 import { buttonVariants } from '@/components/ui/Button'
 import { db } from '@/lib/db'
-import { Redis } from '@/lib/redis'
 import { formatTimeToNow } from '@/lib/utils'
 import { CachedPost } from '@/types/redis'
 import { User, Vote } from '@prisma/client'
 import { ArrowBigDown, ArrowBigUp, Loader2 } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import { FC, Suspense } from 'react'
+import * as redis from 'redis'
 
 interface PageProps {
   params: {
@@ -24,7 +24,14 @@ export const fetchCache = 'force-no-store'
 
 const page: FC<PageProps> = async ({ params }) => {
 
-  const cachedPost = (await Redis.hGetAll(`post:${params.postid}`)) as unknown as CachedPost
+  const cacheConnection = await redis.createClient({
+    url: `rediss://${process.env.AZURE_CACHE_FOR_REDIS_HOST_NAME}:6380`,
+    password: process.env.AZURE_CACHE_FOR_REDIS_ACCESS_KEY
+  }); 
+
+  await cacheConnection.connect();
+
+  let cachedPost = JSON.parse(await cacheConnection.get(`posts : ${params.postid}`) as string) as CachedPost 
 
   let post: (Post & { votes: Vote[]; author: User }) | null = null
 
@@ -41,7 +48,6 @@ const page: FC<PageProps> = async ({ params }) => {
   }
 
   if (!post && !cachedPost) return notFound()
-
 
   return <div>
     <div className='h-full flex flex-col sm:flex-row items-center sm:items-start justify-between'>

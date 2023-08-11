@@ -4,11 +4,20 @@ import { Redis } from "@/lib/redis"
 import { PostVoteValidator } from "@/lib/validators/vote"
 import { CachedPost } from "@/types/redis"
 import { z } from "zod"
+import * as redis from 'redis';
 
 const CACHE_AFTER_UPVOTES = 1
 
 
 export async function PATCH(req: Request) {
+    const cacheConnection = redis.createClient({
+        url: `rediss://${process.env.AZURE_CACHE_FOR_REDIS_HOST_NAME}:6380`,
+        password: process.env.AZURE_CACHE_FOR_REDIS_ACCESS_KEY
+      });
+    
+
+    // Connect to Redis
+    await cacheConnection.connect();
     try {
         const body = await req.json()
         const { postId, voteType } = PostVoteValidator.parse(body)
@@ -117,7 +126,7 @@ export async function PATCH(req: Request) {
                 currentVote: voteType,
                 createdAt: post.createdAt
             }
-            await Redis.set(`posts : ${post.id}`, JSON.stringify(cachePayload))
+            await cacheConnection.set(`posts : ${post.id}`, JSON.stringify(cachePayload))
         }
         return new Response('Vote updated', { status: 200 })
 
