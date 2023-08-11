@@ -1,12 +1,12 @@
 "use client"
-import { FC, startTransition } from 'react'
-import { Button } from './ui/Button';
-import { useMutation } from '@tanstack/react-query';
-import { SubscribeToSubredditPayload } from '@/lib/validators/subreddit';
-import axios, { Axios, AxiosError } from 'axios';
 import { useCustomToast } from '@/hooks/use-custom-toast';
 import { toast } from '@/hooks/use-toast';
+import { SubscribeToSubredditPayload } from '@/lib/validators/subreddit';
+import { useMutation } from '@tanstack/react-query';
+import axios, { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
+import { FC, startTransition } from 'react';
+import { Button } from './ui/Button';
 
 interface SubscribeLeaveToggleProps {
     subredditId: string;

@@ -44,7 +44,7 @@ const PostComment: FC<PostCommentProps> = ({ comment, votesAmt, currentVote, pos
             const { data } = await axios.patch('/api/subreddit/post/comment', payload)
             return data
         },
-        onError: err => {
+        onError: () => {
             return toast({
                 title: "Something went wrong",
                 description: "Comment wasnt posted successfully",

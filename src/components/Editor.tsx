@@ -1,17 +1,14 @@
 "use client"
+import { toast } from '@/hooks/use-toast'
 import { PostCreationRequest, PostValidator } from '@/lib/validators/post'
-import { FC, use, useCallback, useEffect, useRef, useState } from 'react'
+import type EditorJS from '@editorjs/editorjs'
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useMutation } from '@tanstack/react-query'
+import axios from 'axios'
+import { usePathname, useRouter } from 'next/navigation'
+import { FC, useCallback, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import TextareaAutosize from 'react-textarea-autosize'
-import { zodResolver } from "@hookform/resolvers/zod"
-import type EditorJS from '@editorjs/editorjs'
-import { set } from 'date-fns'
-import { BlobServiceClient, ContainerClient } from "@azure/storage-blob";
-import axios from 'axios'
-import { toast } from '@/hooks/use-toast'
-import { on } from 'events'
-import { useMutation } from '@tanstack/react-query'
-import { usePathname, useRouter } from 'next/navigation'
 
 
 
@@ -133,7 +130,7 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
                       },
                     };
                   } catch (error) {
-                    console.error('Error uploading image:', error);
+                    // console.error('Error uploading image:', error);
                     return {
                       success: 0,
                       file: {
@@ -168,6 +165,7 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
 
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
+      // eslint-disable-next-line 
       for (const [_key, value] of Object.entries(errors)) {
         toast({
           title: 'Error',
@@ -207,7 +205,7 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
       const { data } = await axios.post('/api/subreddit/post/create', payload)
       return data
     },
-    onError: (err) => {
+    onError: () => {
       toast({
         title: 'Something went wrong',
         description: 'Your post is not published. Please try again later',

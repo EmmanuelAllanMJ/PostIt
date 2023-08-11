@@ -1,11 +1,9 @@
 import { BlobServiceClient, ContainerClient } from "@azure/storage-blob";
-import { Console } from "console";
 import { nanoid } from "nanoid";
 import sharp from 'sharp';
 
 
 const containerName = `postit`;
-const sasToken = process.env.SAS_TOKEN;
 const storageAccountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
 
 export async function POST(req: Request) {
@@ -31,7 +29,6 @@ export async function POST(req: Request) {
   const contentType = getContentTypeFromExtension(extension);
 
   const result = await blobClient.uploadData(compressedBuffer, { blobHTTPHeaders: { blobContentType: contentType } });
-  console.log("Result", result)
 
   return new Response(JSON.stringify({ message: "success", url: `https://${storageAccountName}.blob.core.windows.net/${containerName}/${blobClient.name}`, status: result._response.status }))
 }

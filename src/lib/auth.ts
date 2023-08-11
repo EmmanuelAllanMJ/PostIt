@@ -1,11 +1,10 @@
-import { Prisma } from "@prisma/client";
-import bcrypt from "bcrypt"
-import { NextAuthOptions, getServerSession } from "next-auth";
-import { db } from "./db";
-import {PrismaAdapter} from "@next-auth/prisma-adapter";
-import GoogleProvider from "next-auth/providers/google";
-import CredentialsProvider from 'next-auth/providers/credentials';
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import bcrypt from "bcrypt";
 import { nanoid } from "nanoid";
+import { NextAuthOptions, getServerSession } from "next-auth";
+import CredentialsProvider from 'next-auth/providers/credentials';
+import GoogleProvider from "next-auth/providers/google";
+import { db } from "./db";
 
 export const authOptions:NextAuthOptions = {
     adapter: PrismaAdapter(db), // Pass Prisma adapter to NextAuth

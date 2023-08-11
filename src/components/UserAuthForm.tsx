@@ -1,21 +1,15 @@
 'use client'
 
+import { Button } from '@/components/ui/Button'
+import { useToast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils'
+import axios from 'axios'
 import { signIn } from 'next-auth/react'
 import * as React from 'react'
 import { FC } from 'react'
-import { Button } from '@/components/ui/Button'
-import { useToast } from '@/hooks/use-toast'
 import { Icons } from './Icons'
-import axios  from 'axios'
-import { 
-  FieldValues, 
-  SubmitHandler, 
-  useForm
-} from "react-hook-form";
-import { nanoid } from 'nanoid'
 
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> { }
 
 const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
   const { toast } = useToast()
@@ -38,29 +32,29 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
     }
   }
 
-  const loginWithCredentials = (e:any) => {
+  const loginWithCredentials = (e: any) => {
     e.preventDefault();
     setIsLoadingCredentials(true);
-    const data={
-      email:e.target[0].value,
-      password:e.target[1].value,
+    const data = {
+      email: e.target[0].value,
+      password: e.target[1].value,
     }
-    try{
+    try {
 
       axios.post('api/register/', data)
-      .then((res) => {
-        // console.log(res);
-        // console.log(res.data);
-      }
-      )
-      .catch((err) => {
-        console.log(err);
-      }
-      )
-      .finally(() => {
-        setIsLoadingCredentials(false)
-      }
-      )
+        .then(() => {
+          // console.log(res);
+          // console.log(res.data);
+        }
+        )
+        .catch(() => {
+          // console.log(err);
+        }
+        )
+        .finally(() => {
+          setIsLoadingCredentials(false)
+        }
+        )
 
     }
     catch (error) {
@@ -93,9 +87,9 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
         <span className='text-gray-400'>or</span>
         <div className='border border-gray-300 w-16' />
       </div>
-      
+
       {/* Credentials */}
-    <form className='flex flex-col space-y-4' onSubmit={loginWithCredentials}>
+      <form className='flex flex-col space-y-4' onSubmit={loginWithCredentials}>
         <div className='flex flex-col space-y-2'>
           <label htmlFor='email' className='text-sm font-medium'>
             Email
@@ -124,19 +118,19 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
             id='cpassword'
             className='border border-gray-300 rounded-sm px-2 py-1 text-sm'
           />
-              <Button
-        isLoading={isLoadingCredentials}
-        type='submit'
-        size='sm'
-        className='w-full'
-    
-        disabled={isLoadingCredentials}>
+          <Button
+            isLoading={isLoadingCredentials}
+            type='submit'
+            size='sm'
+            className='w-full'
 
-        Submit
-      </Button>
+            disabled={isLoadingCredentials}>
+
+            Submit
+          </Button>
         </div>
       </form>
-          
+
     </div>
   )
 }

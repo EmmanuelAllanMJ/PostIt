@@ -1,7 +1,4 @@
 "use client"
-import { Link } from "lucide-react";
-import React, { useState } from "react";
-import { Icons } from "./Icons";
 // import { useTheme } from 'next-themes'
 
 const DarkMode = () => {
