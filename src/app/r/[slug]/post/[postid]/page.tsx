@@ -48,7 +48,7 @@ const page: FC<PageProps> = async ({ params }) => {
   }
 
   if (!post && !cachedPost) return notFound()
-
+  console.log("Server redis", post?.content ?? JSON.parse(cachedPost.content))
   return <div>
     <div className='h-full flex flex-col sm:flex-row items-center sm:items-start justify-between'>
       <Suspense fallback={<PostVoteShell />}>
@@ -76,7 +76,7 @@ const page: FC<PageProps> = async ({ params }) => {
           {post?.title ?? cachedPost.title}
         </h1>
 
-        <EditorOutput content={post?.content ?? cachedPost.content} />
+        <EditorOutput content={post?.content ?? JSON.parse(cachedPost.content)} />
         <Suspense
           fallback={
             <Loader2 className='h-5 w-5 animate-spin text-zinc-500' />
