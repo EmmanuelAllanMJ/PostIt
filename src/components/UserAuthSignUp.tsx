@@ -45,7 +45,6 @@ const UserAuthSignUp: FC<UserAuthFormProps> = ({ className, ...props }) => {
       email:e.target[0].value,
       password:e.target[1].value,
     }
-    console.log(data)
     try{
       await signIn('credentials', { 
         ...data, 

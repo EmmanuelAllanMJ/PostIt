@@ -1,3 +1,4 @@
+import CommentsSection from '@/components/CommentsSection'
 import EditorOutput from '@/components/EditorOutput'
 import Post from '@/components/Post'
 import PostVoteServer from '@/components/post-vote/PostVoteServer'
@@ -74,7 +75,7 @@ const page: FC<PageProps> = async ({ params }) => {
           fallback={
             <Loader2 className='h-5 w-5 animate-spin text-zinc-500' />
           }>
-          {/* <CommentsSection postId={post?.id ?? cachedPost.id} /> */}
+          <CommentsSection postId={post?.id ?? cachedPost.id} />
         </Suspense>
       </div>
     </div>

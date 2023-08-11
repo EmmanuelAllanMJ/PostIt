@@ -6,7 +6,6 @@ import { nanoid } from "nanoid";
 export async function POST(
   request: Request, 
 ) {
-    console.log(request.body)
   const body = await request.json();
   const { 
     email,

@@ -24,7 +24,6 @@ const PostVoteServer= async ({
 
     if(getData){
         const post = await getData()
-        console.log(post)
         if(!post){
             return notFound()
         }
