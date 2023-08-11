@@ -48,7 +48,6 @@ const page: FC<PageProps> = async ({ params }) => {
   }
 
   if (!post && !cachedPost) return notFound()
-  console.log("Server redis", post?.content ?? JSON.parse(cachedPost.content))
   return <div>
     <div className='h-full flex flex-col sm:flex-row items-center sm:items-start justify-between'>
       <Suspense fallback={<PostVoteShell />}>
