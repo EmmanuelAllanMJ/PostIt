@@ -52,13 +52,13 @@ const CommentsSection = async ({ postId }: CommentsSectionProps) => {
                             {topLevelComment.replies.sort(
                                 (a, b) => b.votes.length - a.votes.length)
                                 .map(reply => {
-                                    const replyVotesAmt = topLevelComment.votes.reduce((acc, curr) => {
+                                    const replyVotesAmt = reply.votes.reduce((acc, curr) => {
                                         if (curr.type === 'UP') return acc + 1
                                         if (curr.type === 'DOWN') return acc - 1
                                         return acc
                                     }, 0)
 
-                                    const replyVote = topLevelComment.votes.find(v => v.userId === session?.user?.id)
+                                    const replyVote = reply.votes.find(v => v.userId === session?.user?.id)
 
                                     return <div key={reply.id} className='ml-2 py-2 pl-4 border-l-2 border-zinc-200'>
                                         <PostComment
