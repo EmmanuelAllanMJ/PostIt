@@ -70,7 +70,7 @@ const UserNameForm: FC<UserNameFormProps> = ({user}) => {
   return <form onSubmit={handleSubmit((e)=>{updateUsername(e)})}>
     <Card>
         <CardHeader>Your Username</CardHeader>
-        <CardDescription>
+        <CardDescription className='ml-6'>
             Please enter a display name
         </CardDescription>
         <CardContent>
@@ -83,7 +83,7 @@ const UserNameForm: FC<UserNameFormProps> = ({user}) => {
             </Label>
             <Input
               id='name'
-              className='w-[400px] pl-6'
+              className=' pl-6'
               size={32}
               {...register('name')}
             />
