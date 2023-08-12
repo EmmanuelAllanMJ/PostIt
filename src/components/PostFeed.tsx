@@ -8,13 +8,15 @@ import { INFINITE_SCROLL_PAGINATION_RESULTS } from '@/config';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import Post from './Post';
+import { Loader2 } from 'lucide-react';
 
 interface PostFeedProps {
     initialPosts: ExtendedPost[];
     subredditName?: string;
+    userId?: string;
 }
 
-const PostFeed: FC<PostFeedProps> = ({ initialPosts, subredditName }) => {
+const PostFeed: FC<PostFeedProps> = ({ initialPosts, subredditName, userId }) => {
     const { data: session } = useSession() // for client side 
 
     const lastPostRef = useRef<HTMLElement>(null)
@@ -23,11 +25,13 @@ const PostFeed: FC<PostFeedProps> = ({ initialPosts, subredditName }) => {
         threshold: 1
     })
 
-    const { data, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
+    const { data, fetchNextPage, isFetchingNextPage, hasNextPage } = useInfiniteQuery(
         ['infinite-query'],
         async ({ pageParam = 1 }) => {
+            if(!hasNextPage) return []
             const query = `/api/post?limit=${INFINITE_SCROLL_PAGINATION_RESULTS}&page=${pageParam}` +
-                (!!subredditName ? `&subreddit=${subredditName}` : '')
+                (!!subredditName ? `&subreddit=${subredditName}`: '')+
+                (!!userId ? `&userId=${userId}` : '')
                 const { data } = await axios.get(query)
             return data as ExtendedPost[]
         },
@@ -86,7 +90,7 @@ const PostFeed: FC<PostFeedProps> = ({ initialPosts, subredditName }) => {
                 </li>
             }
         })}
-        {isFetchingNextPage && <div>Loading...</div>}
+        {isFetchingNextPage && hasNextPage && <div className='w-full flex item-center justify-center'> <Loader2 className='h-5 w-5 animate-spin text-zinc-500' /></div>}
 
 
     </ul>

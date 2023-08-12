@@ -25,15 +25,17 @@ export async function GET(req:Request){
 
     try{
         // getting data from the request with validation
-        const {limit, page, subredditName} = z
+        const {limit, page, subredditName, userId} = z
         .object({
             limit:z.string(),
             page:z.string(),
-            subredditName:z.string().nullish().optional()
+            subredditName:z.string().nullish().optional(),
+            userId:z.string().nullish().optional()
         }).parse({
             subredditName:url.searchParams.get('subreddit'),
             limit : url.searchParams.get('limit'),
-            page : url.searchParams.get('page')
+            page : url.searchParams.get('page'),
+            userId : url.searchParams.get('userId')
         })
 
         // constucting whereClause which can be passed to prisma later
@@ -44,6 +46,10 @@ export async function GET(req:Request){
                 subreddit:{
                     name:subredditName
                 }
+            }
+        }else if(userId){
+            whereClause = { 
+                authorId:userId
             }
         }else if (session){
             whereClause = {
